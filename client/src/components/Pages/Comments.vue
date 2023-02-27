@@ -52,6 +52,11 @@
         <p style="font-size: 20px; font-weight: 550">
           {{ state?.tweets?.tweet }}
         </p>
+        <div v-for="data in state?.tweets?.tags">
+          <p style="color: #0d6efd" v-for="tags in data?.tag?.name.split(' ')">
+            #{{ tags }}
+          </p>
+        </div>
       </div>
 
       <div class="contents" v-for="data in state?.comments">
@@ -98,7 +103,7 @@
             <div class="tweet-text tweet-image" v-for="datas in data?.tags">
               <div
                 class="tweet-text tweet-image"
-                v-if="datas?.tag != null"
+                v-if="datas?.tag?.name"
                 style="display: flex; column-gap: 5px"
               >
                 <p style="color: #0d6efd; cursor: pointer">
@@ -270,6 +275,8 @@ export default {
     const getPost = async () => {
       try {
         const { data } = await API.get(`main/getPost/${route.params.id}`)
+
+        console.log(data.data)
 
         return (state.tweets = data.data)
       } catch (e) {

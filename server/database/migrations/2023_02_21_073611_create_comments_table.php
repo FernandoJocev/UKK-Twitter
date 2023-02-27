@@ -19,7 +19,7 @@ class CreateCommentsTable extends Migration
             $table->bigInteger('tweet_id')->unsigned();
             $table->foreign('tweet_id')->references('id')->on('tweets')->onDelete('cascade');
             $table->bigInteger('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

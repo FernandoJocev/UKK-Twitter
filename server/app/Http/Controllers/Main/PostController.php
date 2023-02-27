@@ -160,6 +160,11 @@ class PostController extends Controller
     {
         $tweet = Tweets::with('tags', 'user')->where('id', $id)->first();
 
+        // foreach ($tweet->tags as $data) {
+        //     $tags = $data;
+        //     break;
+        // }
+
         return response()->json([
             'data' => $tweet,
         ]);
@@ -197,25 +202,29 @@ class PostController extends Controller
 
         $post->save();
 
-        if (count($checkTags) == 0 && count($data) > 0) {
-            Tags::create([
-                'name' => $tags,
-            ]);
-        }
-
         $getTweetTags = Tags::latest()->get();
-        $data = Tweets::with('user')->latest()->get();
 
         $tweetTag = TagTweet::where('tweet_id', $id);
 
-        if ($tweetTag != null) {
+        if (count($checkTags) <= 0 && count($data) > 0) {
+            Tags::create([
+                'name' => $tags,
+            ]);
+        } else {
+            Tags::where('id', $getTweetTags[0]->id)->update([
+                'name' => $tags,
+            ]);
+        };
+
+
+        if (count($tweetTag->get()) >= 1) {
             $tweetTag->update([
-                'tweet_id' => $data[0]->id,
+                'tweet_id' => $id,
                 'tag_id' => $getTweetTags[0]->id,
             ]);
         } else if ($tweetTag->first() == null) {
             TagTweet::create([
-                'tweet_id' => $data[0]->id,
+                'tweet_id' => $id,
                 'tag_id' => $getTweetTags[0]->id
             ]);
         }
@@ -272,18 +281,18 @@ class PostController extends Controller
         }
 
         $getCommentTags = Tags::latest()->get();
-        $data = Tweets::with('user')->latest()->get();
+        $dataComment = Comments::latest()->get();
 
         $commentTag = TagComment::where('comment_id', $request->id_comment);
 
         if ($commentTag != null) {
             $commentTag->update([
-                'tweet_id' => $data[0]->id,
+                'comment_id' => $dataComment[0]->id,
                 'tag_id' => $getCommentTags[0]->id,
             ]);
         } else if ($commentTag->first() == null) {
             TagComment::create([
-                'tweet_id' => $data[0]->id,
+                'comment_id' => $dataComment[0]->id,
                 'tag_id' => $getCommentTags[0]->id
             ]);
         }

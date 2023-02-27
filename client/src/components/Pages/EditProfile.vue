@@ -182,6 +182,8 @@ export default {
           ;(state.errorMessage = null), (state.successMessage = null)
         }, 3000)
         getUser()
+
+        window.location.href = '/Profile' 
         return (state.message = data.message)
       } catch (e) {
         setTimeout(() => {

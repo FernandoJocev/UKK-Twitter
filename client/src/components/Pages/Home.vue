@@ -85,7 +85,7 @@
             margin: 20px 20px;
             padding: 10px 10px;
           "
-          v-if="state?.message != null"
+          v-if="state?.message"
         >
           <div class="title-error">
             <h1 style="font-weight: 700; font-size: 28px">
@@ -140,16 +140,18 @@
             <div class="tweet-text tweet-image">
               <div
                 class="tweet-caption"
-                style="display: flex; align-items: center; column-gap: 5px"
+                style="display: flex; column-gap: 5px; flex-direction: column"
               >
                 <p>{{ data?.tweet }}</p>
-                <p
-                  style="color: #0d6efd; cursor: pointer"
-                  v-for="datas in data?.tags"
-                  v-if="data?.tags != 0"
-                >
-                  #{{ datas?.tag?.name }}
-                </p>
+                <div v-for="datas in data?.tags">
+                  <p
+                    style="color: #0d6efd; cursor: pointer"
+                    v-if="state?.tags != 0"
+                    v-for="tags in datas?.tag?.name.split(' ')"
+                  >
+                    #{{ tags }}
+                  </p>
+                </div>
               </div>
               <img
                 :src="'data:image/png;base64,' + data?.media"
@@ -186,7 +188,7 @@
         <h1>Tags</h1>
         <div class="tag" v-for="data in state?.posts">
           <div class="tag-category" v-for="datas in data?.tags">
-            <h1>#{{ datas?.tag?.name }}</h1>
+            <h1 v-for="tags in datas?.tag?.name.split(' ')">#{{ tags }}</h1>
           </div>
         </div>
       </div>
@@ -239,7 +241,6 @@ export default {
       posts: null,
       image: null,
       imageNotNull: null,
-      tags: null,
     })
 
     const file = ref(null)
@@ -247,11 +248,17 @@ export default {
     const getUsers = async () => {
       try {
         const { data } = await API.get('auth/getUsers')
-        console.log(data.data)
+        // console.log(data.data)
+        // for (let i = 0; i < data.data.length; i++) {
+        //   let tags = data.data[i].tags[0].tag.name.split(' ')
+        //   console.log(tags[0])
+        //   state.tags = tags
+        // }
         state.posts = data.data
         if (state.image == null) {
           state.image = data.data.username.charAt(0)
         }
+        return
       } catch (e) {
         state.message = e.response
       }
@@ -677,4 +684,10 @@ input::placeholder {
   font-weight: 500;
   font-size: 15px;
 }
+
+/* @media (max-width: 376px) {
+  .search input {
+    width: 100%;
+  }
+} */
 </style>

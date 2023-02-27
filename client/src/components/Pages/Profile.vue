@@ -102,6 +102,15 @@
             </div>
             <div class="tweet-text tweet-image">
               <p>{{ data?.tweet }}</p>
+              <div v-for="datas in data?.tags">
+                <p
+                  v-for="tags in datas?.tag?.name.split(' ')"
+                  style="color: #0d6efd; cursor: pointer"
+                  v-if="data?.tags != 0"
+                >
+                  #{{ tags }}
+                </p>
+              </div>
               <img
                 :src="'data:image/png;base64,' + data?.media"
                 :alt="data?.tweet"
@@ -125,7 +134,7 @@
         <h1>Tags</h1>
         <div class="tag" v-for="data in state?.posts">
           <div class="tag-category" v-for="datas in data?.tags">
-            <h1>#{{ datas?.tag?.name }}</h1>
+            <h1 v-for="tags in datas?.tag?.name.split(' ')">#{{ tags }}</h1>
           </div>
         </div>
       </div>
@@ -157,11 +166,11 @@ export default {
         if (data.profile == null) {
           state.image = data.username.charAt(0)
           state.user = data
-          return getUser()
+          return getUser() && getUsers()
         }
         state.imageNotNull = data.profile
         state.user = data
-        return getUser()
+        return getUser() && getUsers()
       } catch (e) {
         return (state.message = e.response.message)
       }
@@ -173,7 +182,27 @@ export default {
       tweets: null,
       user: null,
       imageNotNull: null,
+      posts: null,
     })
+
+    const getUsers = async () => {
+      try {
+        const { data } = await API.get('auth/getUsers')
+        // console.log(data.data)
+        // for (let i = 0; i < data.data.length; i++) {
+        //   let tags = data.data[i].tags[0].tag.name.split(' ')
+        //   console.log(tags[0])
+        //   state.tags = tags
+        // }
+        state.posts = data.data
+        if (state.image == null) {
+          state.image = data.data.username.charAt(0)
+        }
+        return
+      } catch (e) {
+        state.message = e.response
+      }
+    }
 
     const getUser = async () => {
       const token = sessionStorage.getItem('token')

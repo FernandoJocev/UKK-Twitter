@@ -142,7 +142,7 @@ export default {
     const getPost = async () => {
       try {
         const { data } = await API.get(`main/getPost/${route.params.id}`)
-        console.log(data.data.tags)
+        // console.log(data.data.tags)
 
         const arr = []
 
@@ -150,8 +150,8 @@ export default {
           for (let i = 0; i < data.data.tags.length; i++) {
             arr.push(data.data.tags[i].tag.name)
           }
-          console.log(arr.join(' #'))
-          return FormData.tweet = data.data.tweet + arr.join(' #')
+          FormData.tweet = data.data.tweet + '#' + arr.join(' #')
+          return
         }
         FormData.tweet = data.data.tweet
         return
@@ -168,7 +168,8 @@ export default {
           `main/updatePost/${route.params.id}`,
           FormData
         )
-        return (state.successMessage = data.message)
+        state.successMessage = data.message
+        return window.location.href = '/Home'
       } catch (e) {
         return (state.errorMessage = e.response.message)
       }
